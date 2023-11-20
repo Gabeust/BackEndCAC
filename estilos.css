@@ -1,0 +1,124 @@
+#inicio {
+    text-align: center;
+    border: solid 1px blue;
+    border-radius: 10px;
+    background-color: rgb(157, 157, 252);
+}
+
+
+#ingreso {
+    margin-top: 1px;
+    border: solid blue;
+    border-radius: 10px;
+
+}
+div h1{
+    margin-top: 23px;
+}
+div h2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+}
+
+#logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#ingreso div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+}
+
+label {
+    width: 100px;
+    text-align: right;
+    margin-right: 10px;
+
+}
+
+input {
+    width: 200px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.botones {
+    width: 100px;
+    border: solid blue;
+    margin-top: 10px;
+    align-items: center;
+    /* margin-left: 60px; */
+    border-radius: 10px;
+}
+
+#productoForm, 
+#proveedoresForm{
+    margin: 20px 0 0 20px;
+    text-align: center;
+}
+
+#productoForm input,
+#proveedoresForm input {
+    width: 250px;
+}
+
+#productoForm label,
+#proveedoresForm label {
+    width: 150px;
+    text-align: left;
+}
+
+@media screen and (max-width: 600px) {
+    #productoForm label,
+    #proveedoresForm label {
+        width: 150px;
+        text-align: center;
+    }
+
+    .bonotera {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+
+    }
+}
+
+/* listado completo */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    text-align: center;
+}
+
+thead {
+    background-color: #f2f2f2;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f3e4e4;
+}
