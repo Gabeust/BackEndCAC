@@ -1,15 +1,20 @@
 let URL = "http://127.0.0.1:5000/";
 let divResultado = document.querySelector("#resultado-peticion");
 let seccionBuscarProveedor = document.querySelector("#seccion-buscar-proveedor");
-seccionBuscarProveedor.style.display = "none";
 let seccionAgregarProveedor = document.querySelector("#seccion-agregar-proveedor");
-seccionAgregarProveedor.style.display = "none";
+let seccionModificarProveedor = document.querySelector("#seccion-modificar-proveedor");
+let seccionEliminarProveedor = document.querySelector("#seccion-eliminar-proveedor");
 
 function ocultarPaneles() {
     seccionBuscarProveedor.style.display = "none";
     seccionAgregarProveedor.style.display = "none";
+    seccionModificarProveedor.style.display = "none";
+    seccionEliminarProveedor.style.display = "none";
     divResultado.innerHTML = '';
 }
+ocultarPaneles();
+
+
 
 /* --------------------------------Listado de Proveedores-------------------------------- */
 let linkListadoProveedores = document.querySelector("#listar-proveedores");
@@ -54,6 +59,8 @@ function listarProveedores(){
         .catch(error => divResultado.innerHTML = "Error al obtener el listado de proveedores")
 }
 
+
+
 /* --------------------------------Buscar Proveedor-------------------------------- */
 let linkBuscarProveedor = document.querySelector("#buscar-proveedor");
 
@@ -92,7 +99,7 @@ formularioBuscarProveedor.addEventListener('submit', evento => {
                 <td>${proveedor.nombre}</td>
                 <td>${proveedor.direccion}</td>
                 <td>${proveedor.email}</td>
-                <td>${proveedor.cuit}</td>
+                <td id="cuit-proveedor-hallado">${proveedor.cuit}</td>
                 <td>${proveedor.telefono}</td>                    
             </tr>`;
 
@@ -100,10 +107,17 @@ formularioBuscarProveedor.addEventListener('submit', evento => {
             resultadoHTML = '<table>\n' + resultadoHTML + '\n</table>';
             
             divResultado.innerHTML = resultadoHTML;
+
+            seccionModificarProveedor.style.display = "inline-block";
+            seccionEliminarProveedor.style.display = "inline-block";
+        
+
         })
         .catch(error => divResultado.innerHTML = `No hallamos ningún proveedor con el CUIT: ${cuit}`)
     }
 })
+
+
 
 /* --------------------------------Agregar Proveedor-------------------------------- */
 let linkAgregarProveedor = document.querySelector("#agregar-proveedor");
@@ -190,6 +204,8 @@ formularioAgregarProveedor.addEventListener('submit', evento => {
 }
 )
 
+
+
 /* --------------------------------Validar Formulario Nuevo Proveedor-------------------------------- */
 function validarNombreProveedor(nombre) {
     let expreg = /^[A-Za-zÑñ]{2,}[A-Za-zÑñ ]{1,}/i; // Inicie con letra, mínimo 2 letras de longitud y puede contener ñ y espacio
@@ -214,4 +230,26 @@ function validarCuitProveedor(cuit) {
 function validarTelefonoProveedor(telefono) {
     let expreg = /[0-9]{3,5}[- ]{0,1}[0-9]{7,9}/i; // Característica entre 3 y 5 dígitos (contemplando el 0), número entre 7 y 9 dígitos (incluyendo o no el 15) y se puede separar con espacio o guión -
     return expreg.test(telefono); 
+}
+
+
+
+/* --------------------------------Eliminar Proveedor-------------------------------- */
+let botonEliminarProveedor = document.querySelector("#eliminar-proveedor");
+
+botonEliminarProveedor.addEventListener("click", eliminarProveedor);
+function eliminarProveedor(){
+    let cuit = divResultado.querySelector("#cuit-proveedor-hallado").textContent;
+    let eliminar = false;
+    eliminar = confirm(`¿Seguro que quiere eliminar el proveedor con CUIT: ${cuit} ?`);
+
+    if (eliminar) {
+        fetch(URL + "proveedor/" + cuit, {method: "DELETE"})
+        .then(respuesta => console.log(respuesta))
+        .then(mensaje => {
+            alert("Proveedor eliminado exitosamente.");
+            generarPanelBuscarProveedor();
+        })
+        .catch(error => console.log("Error al eliminar el proveedor:", error))
+    }
 }
