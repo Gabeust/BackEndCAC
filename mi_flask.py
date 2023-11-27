@@ -59,6 +59,19 @@ class Catalogo:
                 );''')
         self.conn.commit()
 
+        # Creo la tabla proveedores
+        self.cursor.execute('''
+               CREATE TABLE IF NOT EXISTS proveedores(
+               id INT AUTO_INCREMENT,
+               nombre VARCHAR(50) NOT NULL,
+               direccion VARCHAR(255),
+               email VARCHAR(255),
+               cuit VARCHAR(50),
+               telefono VARCHAR(255),
+               PRIMARY KEY (`id`)
+               );''')
+        self.conn.commit()
+
         # Cerrar el cursor inicial y abrir uno nuevo con el parámetro dictionary=True
         self.cursor.close()
         self.cursor = self.conn.cursor(dictionary=True)
@@ -123,12 +136,58 @@ class Catalogo:
         else:
             print("Producto no encontrado.")
 
+    #----------------------------------------------------------------
+    def listar_proveedores(self):
+        self.cursor.execute("SELECT * FROM proveedores")
+        listado_proveedores = self.cursor.fetchall()
+        return listado_proveedores
+    
+    def listar_proveedor_segun_cuit(self, cuit):
+        self.cursor.execute(f"SELECT * FROM proveedores WHERE cuit = '{cuit}';")
+        proveedor = self.cursor.fetchone()
+        return proveedor
+    
+    def agregar_proveedor(self, nombre_prov, direccion_prov, email_prov, cuit_prov, telefono_prov):
+        if self.listar_proveedor_segun_cuit(cuit_prov):
+            return False
+        else:
+            self.cursor.execute(f"""
+                                INSERT INTO proveedores
+                                (nombre, direccion, email, cuit, telefono)
+                                VALUES
+                                ('{nombre_prov}','{direccion_prov}','{email_prov}','{cuit_prov}','{telefono_prov}')
+                                ;""")
+            self.conn.commit()
+            return True
+
+    def modificar_proveedor(self, nuevo_nombre, nueva_direccion, nuevo_email, cuit_prov, nuevo_telefono):
+        self.cursor.execute(f"""
+                            UPDATE proveedores
+                            SET nombre = '{nuevo_nombre}', direccion = '{nueva_direccion}', email = '{nuevo_email}', telefono = '{nuevo_telefono}'
+                            WHERE cuit = '{cuit_prov}'
+                            ;""")
+        self.conn.commit()
+        return self.cursor.rowcount > 0
+
+    def borrar_proveedor(self, cuit_prov):
+        if self.listar_proveedor_segun_cuit(cuit_prov):
+            self.cursor.execute(f"DELETE FROM proveedores WHERE cuit = '{cuit_prov}';")
+            self.conn.commit()
+            return True
+        else:
+            return False
 
 #--------------------------------------------------------------------
 # Cuerpo del programa
 #--------------------------------------------------------------------
 # Crear una instancia de la clase Catalogo
 catalogo = Catalogo(host='localhost', user='root', password='', database='el_cosito')
+print(catalogo.agregar_proveedor("fenergy","Av.Carlos Federico Gauss 5186, Córdoba","fabrifernandezdurand@gmail.com","30-22333444-3",3512028698))
+print(catalogo.agregar_proveedor("ferreteria San Luis","Av. Provincias Unidas 136, (2000) - Rosario, Santa Fe","","30-11222333-1","(0341) 4560301 / 5580022"))
+print(catalogo.agregar_proveedor("Dowen Pagio-Crossmaster","Alberti 2534 Santa Fe Santa Fe","info@dowenpagiocrossmaster.com.ar","30-11232332-2",1124041088))
+
+#print(catalogo.borrar_proveedor("30-11232332-2"))
+print(catalogo.modificar_proveedor("nombre", "direccion", "email", "30-11232332-2", "telefono"))
 
 # Carpeta para guardar las imagenes.
 ruta_destino = './static/imagenes/'
@@ -223,6 +282,68 @@ def eliminar_producto(id):
         return jsonify({"mensaje": "Producto no encontrado"}), 404
 
 #--------------------------------------------------------------------------------
+# Sección proveedores
+@app.route("/proveedores", methods=["GET"])
+def obtener_proveedores():
+    # Coloca el código dentro del contexto de la aplicación
+    proveedores = catalogo.listar_proveedores()
+    return jsonify(proveedores)
+
+@app.route("/proveedor/<string:cuit_proveedor>", methods=["GET"])
+def obtener_proveedor_segun_cuit(cuit_proveedor):
+    # Coloca el código dentro del contexto de la aplicación
+    proveedor = catalogo.listar_proveedor_segun_cuit(cuit_proveedor)
+    return jsonify(proveedor)
+
+@app.route("/proveedor/<string:cuit_proveedor>", methods=["POST"])
+def agregar_proveedor(cuit_proveedor):
+    nombre = request.form['nombre_prov']
+    direccion = request.form['direccion_prov']
+    email = request.form['email_prov']
+    cuit = cuit_proveedor
+    telefono = request.form['telefono_prov']
+    
+    if catalogo.agregar_proveedor(nombre, direccion, email, cuit, telefono):
+        return jsonify({"mensaje": "Proveedor agregado"}), 201
+    else:
+        return jsonify({"mensaje": f"Ya existe el proveedor con CUIT {cuit}"}), 400
+
+@app.route("/proveedor/<string:cuit_proveedor>", methods=["PUT"])
+def actualizar_proveedor(cuit_proveedor):
+    nombre = request.form['nombre_prov']
+    direccion = request.form['direccion_prov']
+    email = request.form['email_prov']
+    cuit = cuit_proveedor
+    telefono = request.form['telefono_prov']
+    
+    if catalogo.modificar_proveedor(nombre, direccion, email, cuit, telefono):
+        return jsonify({"mensaje": "Proveedor actualizado"}), 201
+    else:
+        return jsonify({"mensaje": "No se puedo actualizar la información del proveedor"}), 400
+
+@app.route("/proveedor/<string:cuit_proveedor>", methods=["DELETE"])
+def borrar_proveedor(cuit_proveedor):
+    # Coloca el código dentro del contexto de la aplicación
+    if catalogo.borrar_proveedor(cuit_proveedor):
+        return jsonify({"mensaje": "Proveedor eliminado"}), 201
+    else:
+        return jsonify({"mensaje": f"No se puedo eliminar el proveedor"}), 400
+
+
+
+"""
+#--------------------------------------------------------------------
+@app.route("/productos/<int:id>", methods=["GET"])
+def mostrar_producto(id):
+    producto = catalogo.consultar_producto(id)
+    if producto:
+        return jsonify(producto)
+    else:
+        return "Producto no encontrado", 404
+
+#--------------------------------------------------------------------
+"""
+
 if __name__ == "__main__":
     app.run(debug=True)
 
