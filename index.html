@@ -6,9 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Alta-Modificacion Productos</title>
         <link rel="stylesheet" href="estilos.css">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-            integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     </head>
 
     <body>
@@ -29,15 +27,22 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="altaProducto.html">Alta Productos</a>
                 </li>
+                <li>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Proveedores
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" id="listar-proveedores">Listar</a></li>
+                            <li><a class="dropdown-item" href="#" id="buscar-proveedor">Buscar</a></li>
+                            <li><a class="dropdown-item" href="#" id="agregar-proveedor">Agregar</a></li>
+                            <li><a class="dropdown-item" href="#" id="modificar-proveedor">Modificar</a></li>
+                            <li><a class="dropdown-item" href="#" id="eliminar-proveedor">Eliminar</a></li>
+                        </ul>
+                    </div>
+                </li>
                 <li id="nav-proveedores" class="nav-item">
                     <a class="nav-link" href="altaProveedor.html">Proveedores</a>
-                    <ul>
-                        <li><a href="#" id="listar-proveedores">Listar Todo</a></li>
-                        <li><a href="#" id="buscar-proveedor">Buscar</a></li>
-                        <li><a href="#">Agregar</a></li>
-                        <li><a href="#">Modificar</a></li>
-                        <li><a href="#">Eliminar</a></li>
-                    </ul>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="editarEliminar.html">Editar</a>
@@ -58,10 +63,65 @@
                     <button type="submit">Buscar</button>
                 </form>    
             </section>
+
+            <section id="seccion-agregar-proveedor">
+                <h2 style="text-align: center;">Proveedor</h2>
+                <form action="#" id="form-agregar-proveedor" enctype="multipart/form-data">
+                    <label for="nombre-prov">Nombre (*)</label>
+                    <input type="text" name="nombre-prov" id="nombre-prov" placeholder="Nombre Empresa"><br>
+                    <label for="direccion-prov">Dirección</label>
+                    <input type="text" name="direccion-prov" id="direccion-prov" placeholder="Calle 000 - Provincia"><br>
+                    <label for="email-prov">Email</label>
+                    <input type="text" name="email-prov" id="email-prov" placeholder="mail@dominio.ej"><br>
+                    <label for="cuit-prov">CUIT (*)</label>
+                    <input type="text" name="cuit-prov" id="cuit-prov" placeholder="11-22333444-5"><br>
+                    <label for="telefono-prov">Teléfono</label>
+                    <input type="text" name="telefono-prov" id="telefono-prov" placeholder="0333 154455666"><br>
+                    <p>(*) Datos obligatorios</p>
+                    <button type="submit">Agregar</button>
+                </form>    
+            </section>
+
             <div id="resultado-peticion"></div>
+
+            <section id="seccion-modificar-proveedor">
+                <input type="button" value="Modificar" id="boton-modificar-proveedor">
+            </section>
+
+            <section id="seccion-eliminar-proveedor">
+                <input type="button" value="Eliminar" id="boton-eliminar-proveedor">
+            </section>
+
+            <section id="seccion-editar-proveedor">
+                <h2 style="text-align: center;">Editar datos</h2>
+                <form action="#" id="form-editar-proveedor" enctype="multipart/form-data">
+                    <table>
+                        <tr>
+                            <th>id</th>
+                            <th>nombre (*)</th>
+                            <th>direccion</th>
+                            <th>email</th>
+                            <th>cuit (*)</th>
+                            <th>telefono</th>                    
+                        </tr>
+                        <tr>
+                            <td id="id-prov-igual"></td>
+                            <td><input type="text" name="nombre-prov-nuevo" id="nombre-prov-nuevo"></td>
+                            <td><input type="text" name="direccion-prov-nueva" id="direccion-prov-nueva"></td>
+                            <td><input type="text" name="email-prov-nuevo" id="email-prov-nuevo"></td>
+                            <td id="cuit-proveedor-igual"></td>
+                            <td><input type="text" name="telefono-prov-nuevo" id="telefono-prov-nuevo"></td>                    
+                        </tr>    
+                    </table>
+                    <p>(*) Datos obligatorios</p>
+                    <button type="submit" id="guardar-editar-proveedor">Guardar cambios</button>
+                    <input type="button" value="Cancelar" id="cancelar-editar-proveedor">
+                </form>    
+            </section>
+
         </section>
 
-
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
         <script src="./scripts/crud_proveedores.js"></script>
 
     </body>
