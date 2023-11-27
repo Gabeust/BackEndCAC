@@ -47,33 +47,34 @@
     <div>
       <h2>Altas de Productos:</h2>
     </div><br>
-    <form  id="productoForm" action="http://localhost:5000/productos" method="POST">
-      <label for="productoId">ID:</label>
-      <input type="text" id="productoId" name="productoId"><br><br>
+    <form  id="productoForm" enctype="multipart/form-data">
 
       <label for="productoCode">Código:</label>
-      <input type="text" id="productoCode" name="productoCode"><br><br>
+      <input type="text" id="codigo" name="codigo"><br><br>
 
       <label for="descripcion">Descripcion:</label>
       <input type="text" id="descripcion" name="descripcion"><br><br>
 
       <label for="productoQ">Cantidad:</label>
-      <input type="number" id="productQ" name="productQ"><br><br>
+      <input type="number" id="cantidad" name="cantidad"><br><br>
 
-      <label for="precioCompra">Precio de compra:</label>
-      <input type="number" id="precioCompra" name="precioCompra"><br><br>
+      <label for="precio_compra">Precio de compra:</label>
+      <input type="number" id="precio_compra" name="precio_compra"><br><br>
 
-      <label for="precioVenta">Precio de venta:</label>
-      <input type="number" id="precioVenta" name="precioVenta"><br><br>
+      <label for="precio_venta">Precio de venta:</label>
+      <input type="number" id="precio_venta" name="precio_venta"><br><br>
 
-      <label for="img">Imagen:</label>
-      <input type="text" id="img_url" name="img_url"><br><br>
+      <label for="imagen_url">Imagen:</label>
+      <input type="text" id="imagen_url" name="imagen_url"><br><br>
 
       <label for="proveedor">Proveedor:</label>
       <input type="text" id="proveedor" name="proveedor"><br><br>
+      
+      <label for="categoria">Categoria:</label>
+      <input type="text" id="categoria" name="categoria"><br><br>
 
       <div class="botonera">
-        <input class="botones" type="submit" value="Guardar">
+        <button type="submit" class="botones">Agregar</button>
         <button class="botones">Cancelar</button>
       </div>
     </form>
