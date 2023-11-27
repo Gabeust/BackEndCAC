@@ -2,12 +2,21 @@ let URL = "http://127.0.0.1:5000/";
 let divResultado = document.querySelector("#resultado-peticion");
 let seccionBuscarProveedor = document.querySelector("#seccion-buscar-proveedor");
 seccionBuscarProveedor.style.display = "none";
+let seccionAgregarProveedor = document.querySelector("#seccion-agregar-proveedor");
+seccionAgregarProveedor.style.display = "none";
+
+function ocultarPaneles() {
+    seccionBuscarProveedor.style.display = "none";
+    seccionAgregarProveedor.style.display = "none";
+    divResultado.innerHTML = '';
+}
 
 /* --------------------------------Listado de Proveedores-------------------------------- */
 let linkListadoProveedores = document.querySelector("#listar-proveedores");
 
 linkListadoProveedores.addEventListener("click", listarProveedores);
 function listarProveedores(){
+    ocultarPaneles();
 
     fetch(URL + 'proveedores')
         .then(respuesta => respuesta.json())
@@ -50,6 +59,9 @@ let linkBuscarProveedor = document.querySelector("#buscar-proveedor");
 
 linkBuscarProveedor.addEventListener('click', generarPanelBuscarProveedor);
 function generarPanelBuscarProveedor() {
+    ocultarPaneles();
+    divResultado.innerHTML = '';
+    document.querySelector("#form-buscar-proveedor #cuit-prov").value = '';
     seccionBuscarProveedor.style.display = "block";
 }
 
@@ -61,7 +73,7 @@ formularioBuscarProveedor.addEventListener('submit', evento => {
 
     if (cuit != '') {
         console.log("El CUIT a buscar es:", cuit);
-        fetch(URL + '/proveedor/' + cuit)
+        fetch(URL + 'proveedor/' + cuit)
         .then(respuesta => respuesta.json())
         .then(proveedor => {
             let resultadoHTML = `
@@ -92,3 +104,74 @@ formularioBuscarProveedor.addEventListener('submit', evento => {
         .catch(error => divResultado.innerHTML = `No hallamos ningún proveedor con el CUIT: ${cuit}`)
     }
 })
+
+/* --------------------------------Agregar Proveedor-------------------------------- */
+let linkAgregarProveedor = document.querySelector("#agregar-proveedor");
+
+function limpiarFormularioAgregarProveedor() {
+    document.querySelector("#form-agregar-proveedor #nombre-prov").value = '';
+    document.querySelector("#form-agregar-proveedor #direccion-prov").value = '';
+    document.querySelector("#form-agregar-proveedor #email-prov").value = '';
+    document.querySelector("#form-agregar-proveedor #cuit-prov").value = '';
+    document.querySelector("#form-agregar-proveedor #telefono-prov").value = '';
+}
+
+linkAgregarProveedor.addEventListener('click', generarPanelAgregarProveedor);
+function generarPanelAgregarProveedor() {
+    ocultarPaneles();
+    divResultado.innerHTML = '';
+    limpiarFormularioAgregarProveedor();
+    seccionAgregarProveedor.style.display = "block";
+    
+}
+
+let formularioAgregarProveedor = document.querySelector('#form-agregar-proveedor');
+formularioAgregarProveedor.addEventListener('submit', evento => {
+    evento.preventDefault();
+
+    /* Validar el formulario para crear un nuevo proveedor */
+
+    let datosProveedor = new FormData();
+    let nombre = document.querySelector('#form-agregar-proveedor #nombre-prov').value;
+    datosProveedor.append('nombre-prov', nombre);
+    let direccion = document.querySelector('#form-agregar-proveedor #direccion-prov').value;
+    datosProveedor.append('direccion-prov', direccion);
+    let email = document.querySelector('#form-agregar-proveedor #email-prov').value;
+    datosProveedor.append('email-prov', email);
+    let cuit = document.querySelector('#form-agregar-proveedor #cuit-prov').value;
+    datosProveedor.append('cuit-prov', cuit);
+    let telefono = document.querySelector('#form-agregar-proveedor #telefono-prov').value;    
+    datosProveedor.append('telefono-prov', telefono);
+
+    /*let proveedorNuevo = {
+        nombre_prov: nombre,
+        direccion_prov: direccion,
+        email_prov: email,
+        telefono_prov: telefono};
+
+    console.log("El nuevo proveedor es:", proveedorNuevo); */
+
+    console.log("El nuevo proveedor es:", datosProveedor);
+
+    fetch(URL + "proveedor" , {
+            method: "POST",
+            body: datosProveedor
+        })
+    .then(respuesta => {
+        console.log("Estado del POST: ", respuesta.status);    
+        if(respuesta.status == 400) {
+            alert("Ya existe el proveedor con CUIT:", cuit);
+            throw error;
+        }
+        //respuesta.json();
+        //console.log("Respuesta del POST: ", respuesta);
+    })
+    .then(mensaje => {
+        alert("Proveedor agregado exitosamente.");
+        limpiarFormularioAgregarProveedor();
+    })
+    .catch(error => console.log("Error al agregar el proveedor:", error))
+        
+}
+)
+

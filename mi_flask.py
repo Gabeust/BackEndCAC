@@ -295,13 +295,13 @@ def obtener_proveedor_segun_cuit(cuit_proveedor):
     proveedor = catalogo.listar_proveedor_segun_cuit(cuit_proveedor)
     return jsonify(proveedor)
 
-@app.route("/proveedor/<string:cuit_proveedor>", methods=["POST"])
-def agregar_proveedor(cuit_proveedor):
-    nombre = request.form['nombre_prov']
-    direccion = request.form['direccion_prov']
-    email = request.form['email_prov']
-    cuit = cuit_proveedor
-    telefono = request.form['telefono_prov']
+@app.route("/proveedor", methods=["POST"])
+def agregar_proveedor():
+    nombre = request.form['nombre-prov']
+    direccion = request.form['direccion-prov']
+    email = request.form['email-prov']
+    cuit = request.form['cuit-prov']
+    telefono = request.form['telefono-prov']
     
     if catalogo.agregar_proveedor(nombre, direccion, email, cuit, telefono):
         return jsonify({"mensaje": "Proveedor agregado"}), 201
