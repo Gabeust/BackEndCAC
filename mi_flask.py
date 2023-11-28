@@ -188,9 +188,9 @@ class Catalogo:
 #--------------------------------------------------------------------
 # Crear una instancia de la clase Catalogo
 catalogo = Catalogo(host='localhost', user='root', password='', database='el_cosito')
-print(catalogo.agregar_proveedor("fenergy","Av.Carlos Federico Gauss 5186, Córdoba","fabrifernandezdurand@gmail.com","30-22333444-3",3512028698))
-print(catalogo.agregar_proveedor("ferreteria San Luis","Av. Provincias Unidas 136, (2000) - Rosario, Santa Fe","","30-11222333-1","(0341) 4560301 / 5580022"))
-print(catalogo.agregar_proveedor("Dowen Pagio-Crossmaster","Alberti 2534 Santa Fe Santa Fe","info@dowenpagiocrossmaster.com.ar","30-11232332-2",1124041088))
+#print(catalogo.agregar_proveedor("fenergy","Av.Carlos Federico Gauss 5186, Córdoba","fabrifernandezdurand@gmail.com","30-22333444-3",3512028698))
+#print(catalogo.agregar_proveedor("ferreteria San Luis","Av. Provincias Unidas 136, (2000) - Rosario, Santa Fe","","30-11222333-1","(0341) 4560301 / 5580022"))
+#print(catalogo.agregar_proveedor("Dowen Pagio-Crossmaster","Alberti 2534 Santa Fe Santa Fe","info@dowenpagiocrossmaster.com.ar","30-11232332-2",1124041088))
 
 #print(catalogo.borrar_proveedor("30-11232332-2"))
 print(catalogo.modificar_proveedor("nombre", "direccion", "email", "30-11232332-2", "telefono"))
@@ -282,26 +282,26 @@ def obtener_proveedor_segun_cuit(cuit_proveedor):
     proveedor = catalogo.listar_proveedor_segun_cuit(cuit_proveedor)
     return jsonify(proveedor)
 
-@app.route("/proveedor/<string:cuit_proveedor>", methods=["POST"])
-def agregar_proveedor(cuit_proveedor):
-    nombre = request.form['nombre_prov']
-    direccion = request.form['direccion_prov']
-    email = request.form['email_prov']
-    cuit = cuit_proveedor
-    telefono = request.form['telefono_prov']
+@app.route("/proveedor", methods=["POST"])
+def agregar_proveedor():
+    nombre = request.form['nombre-prov']
+    direccion = request.form['direccion-prov']
+    email = request.form['email-prov']
+    cuit = request.form['cuit-prov']
+    telefono = request.form['telefono-prov']
     
     if catalogo.agregar_proveedor(nombre, direccion, email, cuit, telefono):
         return jsonify({"mensaje": "Proveedor agregado"}), 201
     else:
         return jsonify({"mensaje": f"Ya existe el proveedor con CUIT {cuit}"}), 400
 
-@app.route("/proveedor/<string:cuit_proveedor>", methods=["PUT"])
-def actualizar_proveedor(cuit_proveedor):
-    nombre = request.form['nombre_prov']
-    direccion = request.form['direccion_prov']
-    email = request.form['email_prov']
-    cuit = cuit_proveedor
-    telefono = request.form['telefono_prov']
+@app.route("/proveedor", methods=["PUT"])
+def actualizar_proveedor():
+    nombre = request.form['nombre-prov-editado']
+    direccion = request.form['direccion-prov-editada']
+    email = request.form['email-prov-editado']
+    cuit = request.form['cuit-prov-editado']
+    telefono = request.form['telefono-prov-editado']
     
     if catalogo.modificar_proveedor(nombre, direccion, email, cuit, telefono):
         return jsonify({"mensaje": "Proveedor actualizado"}), 201
