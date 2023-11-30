@@ -44,7 +44,20 @@ class Catalogo:
             else:
                 raise err
 
-        # Una vez que la base de datos está establecida, creamos la tabla si no existe
+        # Creo la tabla proveedores
+        self.cursor.execute('''
+                CREATE TABLE IF NOT EXISTS proveedores(
+                id INT AUTO_INCREMENT,
+                nombre VARCHAR(50) NOT NULL,
+                direccion VARCHAR(255),
+                email VARCHAR(255),
+                cuit VARCHAR(50),
+                telefono VARCHAR(255),
+                PRIMARY KEY (`id`)
+                );''')
+        self.conn.commit()
+
+        
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS productos (
                 id INT NOT NULL AUTO_INCREMENT,
@@ -55,22 +68,10 @@ class Catalogo:
                 precio_venta DECIMAL(10,2) NOT NULL,
                 imagen_url VARCHAR(255),
                 proveedor INT(2),
-                categoria INT(2),           
-                PRIMARY KEY (ID)
+                categoria INT(2),
+                PRIMARY KEY (`id`),
+                FOREIGN KEY (proveedor) REFERENCES proveedores(id)
                 );''')
-        self.conn.commit()
-
-        # Creo la tabla proveedores
-        self.cursor.execute('''
-               CREATE TABLE IF NOT EXISTS proveedores(
-               id INT AUTO_INCREMENT,
-               nombre VARCHAR(50) NOT NULL,
-               direccion VARCHAR(255),
-               email VARCHAR(255),
-               cuit VARCHAR(50),
-               telefono VARCHAR(255),
-               PRIMARY KEY (`id`)
-               );''')
         self.conn.commit()
 
         # Cerrar el cursor inicial y abrir uno nuevo con el parámetro dictionary=True
@@ -78,30 +79,36 @@ class Catalogo:
         self.cursor = self.conn.cursor(dictionary=True)
         
     #----------------------------------------------------------------
-    def agregar_producto(self, codigo, descripcion, cantidad, precio_compra, precio_venta, imagen, proveedor, categoria):
+    def agregar_producto(self, codigo, descripcion, cantidad, precio_compra, precio_venta, imagen, proveedor_codigo, categoria):
         # Verificamos si ya existe un producto con el mismo código
-        self.cursor.execute(f"SELECT * FROM productos WHERE codigo = {codigo}")
+        self.cursor.execute("SELECT * FROM productos WHERE codigo = %s", (codigo,))
         producto_existe = self.cursor.fetchone()
         if producto_existe:
             return False
 
         sql = "INSERT INTO productos (codigo, descripcion, cantidad, precio_compra, precio_venta, imagen_url, proveedor, categoria) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-        valores = (codigo, descripcion, cantidad, precio_compra, precio_venta, imagen, proveedor, categoria)
+        valores = (codigo, descripcion, cantidad, precio_compra, precio_venta, imagen, proveedor_codigo, categoria)
 
-        self.cursor.execute(sql, valores)        
+        self.cursor.execute(sql, valores)
         self.conn.commit()
         return True
     
-    #----------------------------------------------------------------
-    def consultar_producto(self, codigo):
+    #---------------------------------------------------------------
+    def consultar_producto(self, id):
         # Consultamos un producto a partir de su código
-        self.cursor.execute(f"SELECT * FROM productos WHERE id = {codigo}")
+        self.cursor.execute(f"SELECT * FROM productos WHERE id = {id}")
         return self.cursor.fetchone()
+    
+    def consultar_producto_cod(self, codigo):
+        # Consultamos un producto a partir de su código
+        self.cursor.execute(f"SELECT * FROM productos WHERE codigo = {codigo}")
+        return self.cursor.fetchone()
+
 
     #----------------------------------------------------------------
     def modificar_producto(self, id, nuevo_codigo, nueva_descripcion, nueva_cantidad, nuevo_precio_compra, nuevo_precio_venta, nueva_imagen, nuevo_proveedor, nueva_categoria):
         sql = "UPDATE productos SET  codigo = %s, descripcion = %s, cantidad = %s, precio_compra = %s, precio_venta = %s, imagen_url = %s, proveedor = %s, categoria = %s WHERE id = %s"
-        valores = (nuevo_codigo, nueva_descripcion, nueva_cantidad, nuevo_precio_compra, nuevo_precio_venta, nueva_imagen, nuevo_proveedor, nueva_categoria)
+        valores = (id, nuevo_codigo, nueva_descripcion, nueva_cantidad, nuevo_precio_compra, nuevo_precio_venta, nueva_imagen, nuevo_proveedor, nueva_categoria)
         self.cursor.execute(sql, valores)
         self.conn.commit()
         return self.cursor.rowcount > 0
@@ -213,7 +220,14 @@ def mostrar_producto(id):
         return jsonify(producto)
     else:
         return "Producto no encontrado", 404
-
+    
+@app.route("/productos/codigo/<int:codigo>", methods=["GET"])
+def mostrar_producto_cod(codigo):
+        producto = catalogo.consultar_producto_cod(codigo)
+        if producto:
+            return jsonify(producto)
+        else:
+            return jsonify({"mensaje": "Producto no encontrado"}), 404
 #--------------------------------------------------------------------
 
 @app.route("/altaProductos", methods=["POST"])
@@ -235,10 +249,13 @@ def agregar_productos():
 
 #--------------------------------------------------------------------
 
+
 @app.route("/productos/<int:id>", methods=["PUT"])
 def modificar_producto(id):
+    print(f"Recibiendo solicitud PUT para el producto con ID {id}")
+
     # Datos del producto
-    data = request.form
+    data = request.json
     nuevo_codigo = data.get("codigo")
     nueva_descripcion = data.get("descripcion")
     nueva_cantidad = data.get("cantidad")
@@ -248,12 +265,15 @@ def modificar_producto(id):
     nuevo_proveedor = data.get("proveedor")
     nueva_categoria = data.get("categoria")
 
+    print(f"Datos recibidos: {data}")
+
     # Actualización del producto
-    if catalogo.modificar_producto(nuevo_codigo, nueva_descripcion, nueva_cantidad, nuevo_precio_compra,nuevo_precio_venta, nueva_imagen, nuevo_proveedor, nueva_categoria):
+    if catalogo.modificar_producto(nuevo_codigo, nueva_descripcion, nueva_cantidad, nuevo_precio_compra,nuevo_precio_venta, nueva_imagen, nuevo_proveedor, nueva_categoria, id):
+        print("Producto modificado exitosamente.")
         return jsonify({"mensaje": "Producto modificado"}), 200
     else:
+        print("Producto no encontrado.")
         return jsonify({"mensaje": "Producto no encontrado"}), 404
-
 
 #--------------------------------------------------------------------
 
@@ -261,7 +281,6 @@ def modificar_producto(id):
 def eliminar_producto(id):
     # Primero, obtén la información del producto para encontrar la imagen
     producto = catalogo.consultar_producto(id)
- 
         # Luego, elimina el producto del catálogo
     if catalogo.eliminar_producto(id):
             return jsonify({"mensaje": "Producto eliminado"}), 200
@@ -317,21 +336,6 @@ def borrar_proveedor(cuit_proveedor):
         return jsonify({"mensaje": f"No se puedo eliminar el proveedor"}), 400
 
 
-
-"""
-#--------------------------------------------------------------------
-@app.route("/productos/<int:id>", methods=["GET"])
-def mostrar_producto(id):
-    producto = catalogo.consultar_producto(id)
-    if producto:
-        return jsonify(producto)
-    else:
-        return "Producto no encontrado", 404
-
-#--------------------------------------------------------------------
-"""
-
 if __name__ == "__main__":
     app.run(debug=True)
-
 
