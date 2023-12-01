@@ -181,7 +181,9 @@ class Catalogo:
 # Cuerpo del programa
 #--------------------------------------------------------------------
 # Crear una instancia de la clase Catalogo
-catalogo = Catalogo(host='localhost', user='root', password='', database='el_cosito')
+#catalogo = Catalogo(host='localhost', user='root', password='', database='el_cosito') # Funciona localmente
+catalogo = Catalogo(host='matanus.mysql.pythonanywhere-services.com', user='matanus', password='passMySQL004', database='matanus$ferreDB')
+
 #print(catalogo.agregar_proveedor("fenergy","Av.Carlos Federico Gauss 5186, Córdoba","fabrifernandezdurand@gmail.com","30-22333444-3",3512028698))
 #print(catalogo.agregar_proveedor("ferreteria San Luis","Av. Provincias Unidas 136, (2000) - Rosario, Santa Fe","","30-11222333-1","(0341) 4560301 / 5580022"))
 #print(catalogo.agregar_proveedor("Dowen Pagio-Crossmaster","Alberti 2534 Santa Fe Santa Fe","info@dowenpagiocrossmaster.com.ar","30-11232332-2",1124041088))
@@ -191,6 +193,12 @@ print(catalogo.modificar_proveedor("nombre", "direccion", "email", "30-11232332-
 
 # Carpeta para guardar las imagenes.
 ruta_destino = './static/imagenes/'
+
+#--------------------------------------------------------------------
+# Mensaje de bienvenida
+@app.route('/')
+def bienvenida():
+    return '<h1>Bienvenidos a la Ferreteria El Cosito</h1>'
 #--------------------------------------------------------------------
 # Ruta para listar productos
 @app.route("/productos", methods=["GET"])
