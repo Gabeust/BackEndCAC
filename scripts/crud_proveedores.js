@@ -1,4 +1,4 @@
-//let URL = "http://127.0.0.1:5000/"; # Funciona localmente
+//let URL = "http://127.0.0.1:5000/"; // Funciona localmente
 let URL = "https://matanus.pythonanywhere.com/";
 let divResultado = document.querySelector("#resultado-peticion");
 let seccionBuscarProveedor = document.querySelector("#seccion-buscar-proveedor");

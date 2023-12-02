@@ -218,12 +218,12 @@ class Catalogo:
             return True
         
     def listar_usuario_segun_mail(self, email_us):
-        self.cursor.execute(f"SELECT * FROM usuarios WHERE email = '{email_us}';")
+        self.cursor.execute(f"SELECT nombre, apellido, email, telefono FROM usuarios WHERE email = '{email_us}';")
         usuario = self.cursor.fetchone()
         return usuario
-
-    def listar_usuario_segun_mail_y_clave(self, email_us, claveingreso_us):
-        self.cursor.execute(f"SELECT * FROM usuarios WHERE email = '{email_us}' AND claveingreso = '{claveingreso_us}';")
+    
+    def verificar_usuario(self, email_us, clave_us):
+        self.cursor.execute(f"SELECT * FROM usuarios WHERE email = '{email_us}' AND claveingreso = '{clave_us}';")
         usuario = self.cursor.fetchone()
         return usuario
 
@@ -242,8 +242,9 @@ catalogo = Catalogo(host='localhost', user='root', password='', database='el_cos
 #print(catalogo.modificar_proveedor("nombre", "direccion", "email", "30-11232332-2", "telefono"))
 
 print(catalogo.agregar_usuario("Juan", "Perez", "juanp@ferreteria.com", "1124040404", "Ferre@123", "CRUD"))
-#print(catalogo.listar_usuario_segun_mail("juanp@ferreteria.com"))
-print(catalogo.listar_usuario_segun_mail_y_clave("juanp@ferreteria.com", "Ferre@123"))
+print(catalogo.listar_usuario_segun_mail("juanp@ferreteria.com"))
+print(catalogo.verificar_usuario("juanp@ferreteria.com", "Ferre@123"))
+
 
 # Carpeta para guardar las imagenes.
 ruta_destino = './static/imagenes/'
@@ -386,14 +387,15 @@ def borrar_proveedor(cuit_proveedor):
 
 #--------------------------------------------------------------------------------
 # Sección usuarios
-@app.route("/iniciarSesion", methods=["GET"])
-def iniciar_sesion():
-    email = request.form['email-usuario']
-    clave = request.form['clave-usuario']
-    
-    usuario = catalogo.listar_usuario_segun_mail_y_clave(email, clave)
+@app.route("/iniciarSesion/<string:email_usuario>", methods=["GET"])
+def listar_usuario(email_usuario):
+    usuario = catalogo.listar_usuario_segun_mail(email_usuario)
     return jsonify(usuario)
 
+@app.route("/iniciarSesion/<string:email_usuario>/<string:clave_usuario>", methods=["GET"])
+def iniciar_sesion(email_usuario, clave_usuario):
+    usuario = catalogo.verificar_usuario(email_usuario, clave_usuario)
+    return jsonify(usuario)
 
 if __name__ == "__main__":
     app.run(debug=True)
