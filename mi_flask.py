@@ -57,6 +57,19 @@ class Catalogo:
                 );''')
         self.conn.commit()
 
+        # Creo la tabla usuarios
+        self.cursor.execute('''
+                CREATE TABLE IF NOT EXISTS usuarios(
+                id INT AUTO_INCREMENT,
+                nombre VARCHAR(50) NOT NULL,
+                apellido VARCHAR(50),
+                email VARCHAR(255) NOT NULL,
+                telefono VARCHAR(255),
+                claveingreso VARCHAR(50) NOT NULL,
+                permiso VARCHAR(4) NOT NULL,
+                PRIMARY KEY (`id`)
+                );''')
+        self.conn.commit()
         
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS productos (
@@ -189,20 +202,48 @@ class Catalogo:
             return True
         else:
             return False
+        
+    # ----------------------------------------------------------------
+    def agregar_usuario(self, nombre_us, apellido_us, email_us, telefono_us, claveingreso_us, permiso_us):
+        if self.listar_usuario_segun_mail(email_us):
+            return False
+        else:
+            self.cursor.execute(f"""
+                                INSERT INTO usuarios
+                                (nombre, apellido, email, telefono, claveingreso, permiso)
+                                VALUES
+                                ('{nombre_us}','{apellido_us}','{email_us}','{telefono_us}','{claveingreso_us}', '{permiso_us}')
+                                ;""")
+            self.conn.commit()
+            return True
+        
+    def listar_usuario_segun_mail(self, email_us):
+        self.cursor.execute(f"SELECT * FROM usuarios WHERE email = '{email_us}';")
+        usuario = self.cursor.fetchone()
+        return usuario
+
+    def listar_usuario_segun_mail_y_clave(self, email_us, claveingreso_us):
+        self.cursor.execute(f"SELECT * FROM usuarios WHERE email = '{email_us}' AND claveingreso = '{claveingreso_us}';")
+        usuario = self.cursor.fetchone()
+        return usuario
 
 #--------------------------------------------------------------------
 # Cuerpo del programa
 #--------------------------------------------------------------------
 # Crear una instancia de la clase Catalogo
-#catalogo = Catalogo(host='localhost', user='root', password='', database='el_cosito') # Funciona localmente
-catalogo = Catalogo(host='matanus.mysql.pythonanywhere-services.com', user='matanus', password='passMySQL004', database='matanus$ferreDB')
+catalogo = Catalogo(host='localhost', user='root', password='', database='el_cosito') # Funciona localmente
+#catalogo = Catalogo(host='matanus.mysql.pythonanywhere-services.com', user='matanus', password='passMySQL004', database='matanus$ferreDB')
 
 #print(catalogo.agregar_proveedor("fenergy","Av.Carlos Federico Gauss 5186, Córdoba","fabrifernandezdurand@gmail.com","30-22333444-3",3512028698))
 #print(catalogo.agregar_proveedor("ferreteria San Luis","Av. Provincias Unidas 136, (2000) - Rosario, Santa Fe","","30-11222333-1","(0341) 4560301 / 5580022"))
 #print(catalogo.agregar_proveedor("Dowen Pagio-Crossmaster","Alberti 2534 Santa Fe Santa Fe","info@dowenpagiocrossmaster.com.ar","30-11232332-2",1124041088))
 
 #print(catalogo.borrar_proveedor("30-11232332-2"))
-print(catalogo.modificar_proveedor("nombre", "direccion", "email", "30-11232332-2", "telefono"))
+#print(catalogo.modificar_proveedor("nombre", "direccion", "email", "30-11232332-2", "telefono"))
+
+print(catalogo.agregar_usuario("Juan", "Perez", "juanp@ferreteria.com", "1124040404", "Ferre@123", "CRUD"))
+#print(catalogo.listar_usuario_segun_mail("juanp@ferreteria.com"))
+print(catalogo.listar_usuario_segun_mail_y_clave("juanp@ferreteria.com", "Ferre@123"))
 
 # Carpeta para guardar las imagenes.
 ruta_destino = './static/imagenes/'
@@ -342,6 +383,16 @@ def borrar_proveedor(cuit_proveedor):
         return jsonify({"mensaje": "Proveedor eliminado"}), 201
     else:
         return jsonify({"mensaje": f"No se puedo eliminar el proveedor"}), 400
+
+#--------------------------------------------------------------------------------
+# Sección usuarios
+@app.route("/iniciarSesion", methods=["GET"])
+def iniciar_sesion():
+    email = request.form['email-usuario']
+    clave = request.form['clave-usuario']
+    
+    usuario = catalogo.listar_usuario_segun_mail_y_clave(email, clave)
+    return jsonify(usuario)
 
 
 if __name__ == "__main__":

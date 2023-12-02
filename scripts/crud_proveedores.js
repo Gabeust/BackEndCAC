@@ -220,6 +220,7 @@ function validarCuitProveedor(cuit) {
 
 function validarTelefonoProveedor(telefono) {
     let expreg = /[0-9]{3,5}[- ]{0,1}[0-9]{7,9}/i; // Característica entre 3 y 5 dígitos (contemplando el 0), número entre 7 y 9 dígitos (incluyendo o no el 15) y se puede separar con espacio o guión -
+    // Corregir validacion para tel 011, ej 1124041088
     return expreg.test(telefono); 
 }
 
