@@ -1,4 +1,5 @@
-let URL = "http://127.0.0.1:5000/";
+//let URL = "http://127.0.0.1:5000/"; // Funciona localmente
+let URL = "https://matanus.pythonanywhere.com/";
 let divResultado = document.querySelector("#resultado-peticion");
 let seccionBuscarProveedor = document.querySelector("#seccion-buscar-proveedor");
 let seccionAgregarProveedor = document.querySelector("#seccion-agregar-proveedor");
@@ -218,7 +219,7 @@ function validarCuitProveedor(cuit) {
 }
 
 function validarTelefonoProveedor(telefono) {
-    let expreg = /[0-9]{3,5}[- ]{0,1}[0-9]{7,9}/i; // Característica entre 3 y 5 dígitos (contemplando el 0), número entre 7 y 9 dígitos (incluyendo o no el 15) y se puede separar con espacio o guión -
+    let expreg = /[0-9]{2,5}[- ]{0,1}[0-9]{7,10}/i; // Característica entre 2 y 5 dígitos (contemplando el 0), número entre 7 y 10 dígitos (incluyendo o no el 15) y se puede separar con espacio o guión -
     return expreg.test(telefono); 
 }
 
